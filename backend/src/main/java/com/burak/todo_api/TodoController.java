@@ -7,6 +7,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/todos")
+@CrossOrigin(origins = "http://localhost:5173")
 public class TodoController {
 
     private final TodoRepository todoRepository;
