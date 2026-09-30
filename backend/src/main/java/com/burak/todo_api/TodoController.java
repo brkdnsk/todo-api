@@ -5,9 +5,9 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5174", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 @RestController
-@RequestMapping("/todos")
-@CrossOrigin(origins = "http://localhost:5173")
+@RequestMapping("/api/todos")
 public class TodoController {
 
     private final TodoRepository todoRepository;

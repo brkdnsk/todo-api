@@ -16,7 +16,7 @@ public class Todo {
     @NotBlank(message = "Görev başlığı boş olamaz!")
     private String title;
 
-    private boolean completed;
+    private Boolean completed;
 
     // Hibernate (JPA) için boş bir kurucu metot (Constructor) şarttır
     public Todo() {
