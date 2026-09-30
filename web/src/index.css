@@ -55,6 +55,8 @@ body {
 	margin: 0;
 }
 
+@import "tailwindcss";
+
 #root {
 	width: 1126px;
 	max-width: 100%;
