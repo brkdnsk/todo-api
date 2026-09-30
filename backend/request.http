@@ -1,0 +1,46 @@
+### 1. Tüm Görevleri Listele (GET)
+GET http://localhost:8080/todos
+
+### ---
+
+### 2. Yeni Bir Görev Ekle (POST)
+POST http://localhost:8080/todos
+Content-Type: application/json
+
+{
+  "title": "CRUD operasyonlarini ogren",
+  "completed": false
+}
+
+### ---
+
+### 3. Belirli Bir ID'ye Sahip Görevi Getir (GET by ID)
+# (Not: Aşağıdaki 1 yerine veritabanındaki mevcut bir ID'yi yazabilirsin)
+GET http://localhost:8080/todos/1
+
+### ---
+
+### 4. Var Olan Bir Görevi Güncelle (PUT)
+# (Görev başlığını değiştirip completed değerini true yapıyoruz)
+PUT http://localhost:8080/todos/2
+Content-Type: application/json
+
+{
+  "title": "CRUD operasyonlarini basariyla ogrendim! 🎉",
+  "completed": true
+}
+
+### ---
+
+### 5. Bir Görevi Sil (DELETE)
+# (1 numaralı görevi veritabanından kalıcı olarak siliyoruz)
+DELETE http://localhost:8080/todos/1
+
+### Boş Başlık Testi (Validation Testi)
+POST http://localhost:8080/todos
+Content-Type: application/json
+
+{
+  "title": "",
+  "completed": false
+}
