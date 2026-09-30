@@ -33,7 +33,7 @@ function App() {
 			headers: {
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify({ title: newTodo }),
+			body: JSON.stringify({ title: newTodo, completed: false }),
 		})
 			.then((response) => response.json())
 			.then((data) => {
@@ -43,13 +43,34 @@ function App() {
 			.catch((error) => console.error("Todo eklenirken hata:", error));
 	};
 
-	// 3. Görev Silme (DELETE)
+	// 3. Görev Durumunu Güncelleme (PUT - Tamamlandı / Tamamlanmadı)
+	const handleToggleTodo = (todo) => {
+		fetch(`http://localhost:8080/api/todos/${todo.id}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				title: todo.title,
+				completed: !todo.completed,
+			}),
+		})
+			.then((response) => response.json())
+			.then((updatedTodo) => {
+				// Listede ilgili todoyu güncel haliyle değiştir
+				setTodos(
+					todos.map((t) => (t.id === updatedTodo.id ? updatedTodo : t))
+				);
+			})
+			.catch((error) => console.error("Todo güncellenirken hata:", error));
+	};
+
+	// 4. Görev Silme (DELETE)
 	const handleDeleteTodo = (id) => {
 		fetch(`http://localhost:8080/api/todos/${id}`, {
 			method: "DELETE",
 		})
 			.then(() => {
-				// Silinen görev dışındakileri filtreleyerek listeyi anında güncelle
 				setTodos(todos.filter((todo) => todo.id !== id));
 			})
 			.catch((error) => console.error("Todo silinirken hata:", error));
@@ -96,7 +117,17 @@ function App() {
 								key={todo.id || index}
 								className="p-3 bg-slate-700/50 rounded-xl border border-slate-600 flex justify-between items-center group hover:border-slate-500 transition-all"
 							>
-								<span className="text-slate-100">{todo.title}</span>
+								{/* Görev Yazısı ve Tıklayınca Üstünü Çizme */}
+								<span
+									onClick={() => handleToggleTodo(todo)}
+									className={`cursor-pointer flex-1 mr-3 select-none transition-all ${
+										todo.completed
+											? "line-through text-slate-500"
+											: "text-slate-100"
+									}`}
+								>
+									{todo.title}
+								</span>
 
 								{/* Silme Butonu */}
 								<button
