@@ -33,14 +33,26 @@ function App() {
 			headers: {
 				"Content-Type": "application/json",
 			},
-			body: JSON.stringify({ title: newTodo, completed: false }), // Backend'deki değişken adın farklıysa (örn: task) burayı ona göre ayarlayabilirsin
+			body: JSON.stringify({ title: newTodo }),
 		})
 			.then((response) => response.json())
 			.then((data) => {
-				setTodos([...todos, data]); // Listeye yeni eklenen todoyu anında dahil et
-				setNewTodo(""); // Input kutusunu temizle
+				setTodos([...todos, data]);
+				setNewTodo("");
 			})
 			.catch((error) => console.error("Todo eklenirken hata:", error));
+	};
+
+	// 3. Görev Silme (DELETE)
+	const handleDeleteTodo = (id) => {
+		fetch(`http://localhost:8080/api/todos/${id}`, {
+			method: "DELETE",
+		})
+			.then(() => {
+				// Silinen görev dışındakileri filtreleyerek listeyi anında güncelle
+				setTodos(todos.filter((todo) => todo.id !== id));
+			})
+			.catch((error) => console.error("Todo silinirken hata:", error));
 	};
 
 	return (
@@ -79,12 +91,20 @@ function App() {
 					</p>
 				) : (
 					<ul className="space-y-3">
-						{todos.map((todo) => (
+						{todos.map((todo, index) => (
 							<li
-								key={todo.id}
-								className="p-3 bg-slate-700/50 rounded-xl border border-slate-600 flex justify-between items-center"
+								key={todo.id || index}
+								className="p-3 bg-slate-700/50 rounded-xl border border-slate-600 flex justify-between items-center group hover:border-slate-500 transition-all"
 							>
-								<span>{todo.title || todo.title}</span>
+								<span className="text-slate-100">{todo.title}</span>
+
+								{/* Silme Butonu */}
+								<button
+									onClick={() => handleDeleteTodo(todo.id)}
+									className="px-3 py-1 bg-rose-500/20 hover:bg-rose-500 text-rose-400 hover:text-white text-sm font-medium rounded-lg transition-all"
+								>
+									Sil
+								</button>
 							</li>
 						))}
 					</ul>
