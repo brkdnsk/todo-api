@@ -4,6 +4,7 @@ function App() {
 	const [todos, setTodos] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [newTodo, setNewTodo] = useState("");
+	const [filter, setFilter] = useState("all"); // 'all', 'active', 'completed'
 
 	// 1. Verileri backend'den çekme (GET)
 	const fetchTodos = () => {
@@ -43,7 +44,7 @@ function App() {
 			.catch((error) => console.error("Todo eklenirken hata:", error));
 	};
 
-	// 3. Görev Durumunu Güncelleme (PUT - Tamamlandı / Tamamlanmadı)
+	// 3. Görev Durumunu Güncelleme (PUT)
 	const handleToggleTodo = (todo) => {
 		fetch(`http://localhost:8080/api/todos/${todo.id}`, {
 			method: "PUT",
@@ -57,7 +58,6 @@ function App() {
 		})
 			.then((response) => response.json())
 			.then((updatedTodo) => {
-				// Listede ilgili todoyu güncel haliyle değiştir
 				setTodos(
 					todos.map((t) => (t.id === updatedTodo.id ? updatedTodo : t))
 				);
@@ -76,6 +76,13 @@ function App() {
 			.catch((error) => console.error("Todo silinirken hata:", error));
 	};
 
+	// 5. Filtreleme Mantığı
+	const filteredTodos = todos.filter((todo) => {
+		if (filter === "active") return !todo.completed;
+		if (filter === "completed") return todo.completed;
+		return true; // 'all'
+	});
+
 	return (
 		<div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white p-6">
 			<h1 className="text-4xl font-bold mb-6 text-emerald-400">
@@ -88,7 +95,7 @@ function App() {
 				</h2>
 
 				{/* Yeni Todo Ekleme Formu */}
-				<form onSubmit={handleAddTodo} className="flex gap-2 mb-6">
+				<form onSubmit={handleAddTodo} className="flex gap-2 mb-4">
 					<input
 						type="text"
 						value={newTodo}
@@ -104,20 +111,53 @@ function App() {
 					</button>
 				</form>
 
+				{/* Filtreleme Sekmeleri */}
+				<div className="flex justify-between bg-slate-700/40 p-1 rounded-xl mb-6 border border-slate-700">
+					<button
+						onClick={() => setFilter("all")}
+						className={`flex-1 py-1.5 text-sm font-medium rounded-lg transition-all ${
+							filter === "all"
+								? "bg-emerald-500 text-slate-950 shadow"
+								: "text-slate-400 hover:text-white"
+						}`}
+					>
+						Tümü
+					</button>
+					<button
+						onClick={() => setFilter("active")}
+						className={`flex-1 py-1.5 text-sm font-medium rounded-lg transition-all ${
+							filter === "active"
+								? "bg-emerald-500 text-slate-950 shadow"
+								: "text-slate-400 hover:text-white"
+						}`}
+					>
+						Aktif
+					</button>
+					<button
+						onClick={() => setFilter("completed")}
+						className={`flex-1 py-1.5 text-sm font-medium rounded-lg transition-all ${
+							filter === "completed"
+								? "bg-emerald-500 text-slate-950 shadow"
+								: "text-slate-400 hover:text-white"
+						}`}
+					>
+						Tamamlanan
+					</button>
+				</div>
+
 				{loading ? (
 					<p className="text-slate-400 text-center">Yükleniyor...</p>
-				) : todos.length === 0 ? (
+				) : filteredTodos.length === 0 ? (
 					<p className="text-slate-400 text-center">
-						Henüz eklenmiş bir todo yok.
+						Bu kategoride görev bulunmuyor.
 					</p>
 				) : (
 					<ul className="space-y-3">
-						{todos.map((todo, index) => (
+						{filteredTodos.map((todo, index) => (
 							<li
 								key={todo.id || index}
 								className="p-3 bg-slate-700/50 rounded-xl border border-slate-600 flex justify-between items-center group hover:border-slate-500 transition-all"
 							>
-								{/* Görev Yazısı ve Tıklayınca Üstünü Çizme */}
 								<span
 									onClick={() => handleToggleTodo(todo)}
 									className={`cursor-pointer flex-1 mr-3 select-none transition-all ${
@@ -129,7 +169,6 @@ function App() {
 									{todo.title}
 								</span>
 
-								{/* Silme Butonu */}
 								<button
 									onClick={() => handleDeleteTodo(todo.id)}
 									className="px-3 py-1 bg-rose-500/20 hover:bg-rose-500 text-rose-400 hover:text-white text-sm font-medium rounded-lg transition-all"
